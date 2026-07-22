@@ -10,6 +10,25 @@ Each phase, I write the code, then walk you through the architecture and
 concepts behind it — the same way a senior engineer would explain a design
 to a new teammate, not a coding tutorial.
 
+### Design direction
+
+This is not a pixel-for-pixel Gmail clone. We borrow Gmail's *information
+architecture* (sidebar, list, compose) but the visual language is
+**Superhuman-inspired**: dark-by-default, minimal chrome, one accent color,
+buttery 150-250ms transitions, keyboard-first affordances (shortcut hints
+on hover) — with a full light mode available via a toggle. Superhuman is
+the right reference, not an arbitrary one: it's an email client that solved
+the *exact* problems this project solves — speed at scale, keyboard
+navigation — and made them feel premium instead of utilitarian. That's the
+bar: something a dev looks at and asks "wait, how did you build that."
+
+The real lesson here: **visual design and system architecture are separate
+concerns.** The virtualization engine doesn't know or care whether a row is
+navy-on-dark or white-on-light — it only cares about scrollTop and row
+height. We can swap the entire visual language without touching the data,
+state, virtualization, or event layers at all. That separation is what
+makes a theme toggle a small feature instead of a rewrite.
+
 ---
 
 ## PART 1 — THE ARCHITECTURE
@@ -46,8 +65,8 @@ production frontend (Gmail, Figma, VS Code) is actually built.
    subject, snippet, timestamp, read/unread). This is your fake "database."
 2. **State Layer** (`state.js`) — the single source of truth: which email is
    selected, current scroll position, which row is keyboard-focused, is the
-   compose modal open, is the app still "loading." Nothing else is allowed to
-   hold its own copy of this data.
+   compose modal open, is the app still "loading," and which theme (light/
+   dark) is active. Nothing else is allowed to hold its own copy of this data.
 3. **Virtualization Engine** (`virtualList.js`) — the core feature. Given
    scroll position + row height + viewport height, it computes "only rows 40
    through 55 need to exist right now" and hands that window to the renderer.
@@ -128,6 +147,11 @@ like this?" by looking at state, instead of hunting through event handlers.
 11. **Perceived performance / skeleton screens** — why a gray placeholder
     that matches the final layout feels faster than a spinner, even at the
     same actual load time.
+12. **Design tokens & theming (CSS custom properties)** — defining every
+    color, spacing, and radius once as a CSS variable, then flipping a
+    `data-theme` attribute to swap the entire palette instantly. This is
+    how real design systems (and dark-mode toggles everywhere) work under
+    the hood, no framework required.
 
 ---
 
@@ -152,17 +176,25 @@ history starting point.
 - "Walk me through your commit history — what does it tell me about how you
   built this?"
 
-### Phase 1 — Static Shell (Pixel-Perfect Layout)
+### Phase 1 — Static Shell & Design System (Superhuman-Inspired, Light/Dark)
 
-**Build:** sidebar (Compose button, folder list), top header (search bar,
-account icon), main content grid — all with real Gmail's spacing, colors,
-and fonts, but no data yet.
-**Accomplish after:** a static page that *looks* like Gmail on any screen
-size, with zero JavaScript.
-**Concepts used:** box model, Flexbox/Grid, responsive layout.
+**Build:** sidebar (Compose button, folder list), top header (search,
+account), main content grid — Gmail's information architecture, Superhuman's
+visual language: dark-by-default, one accent color, generous whitespace,
+every color/spacing/radius defined once as a CSS custom property, plus a
+light-mode toggle that swaps the whole token set instantly. No data yet.
+**Accomplish after:** a static, zero-JS-data page that already looks premium
+in both themes, and a theming architecture every later phase inherits for
+free — nobody has to think about "does this new component support dark
+mode," it already does.
+**Concepts used:** box model, Flexbox/Grid, responsive layout, CSS custom
+properties & design tokens, theme toggling without a framework.
 **Interview questions:**
 - "Why Flexbox/Grid here instead of floats or absolute positioning?"
 - "How does this layout behave at 320px wide, and how did you handle it?"
+- "Walk me through your theming system — why CSS variables over two
+  stylesheets or a CSS-in-JS approach?"
+- "How do you avoid a flash of the wrong theme on page load?"
 - "What's the difference between reflow and repaint — does your layout
   trigger unnecessary ones?"
 
@@ -252,16 +284,19 @@ async loading, layout-shift-free placeholder design.
 
 ### Phase 7 — Polish, Accessibility & Final Pass
 
-**Build:** cross-browser check, Lighthouse pass, ARIA labels, README with
-setup + architecture notes, final pixel-diff against real Gmail.
+**Build:** cross-browser check, Lighthouse pass, ARIA labels + color-contrast
+verification on *both* themes, micro-animation timing pass, README with
+setup + architecture notes.
 **Accomplish after:** a portfolio-ready project with a README a senior dev
 (or IB recruiter doing a "tell me about a project" round) can skim in two
-minutes.
-**Concepts used:** accessibility basics (ARIA), performance auditing,
-technical writing.
+minutes — and a demo that looks intentional, not like a tutorial project.
+**Concepts used:** accessibility basics (ARIA, contrast ratios), performance
+auditing, technical writing.
 **Interview questions:**
 - "What's your Lighthouse performance score, and what's the remaining
   bottleneck?"
+- "How did you verify color contrast holds up in both your light and dark
+  themes?"
 - "If this needed a real backend tomorrow, what in your architecture changes
   vs. stays the same?"
 - "How would you add automated tests to this, with no framework?"
