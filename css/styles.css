@@ -159,7 +159,7 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
   width: 28px;
   height: 28px;
   border-radius: var(--radius-md);
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   color: var(--accent-contrast);
 }
 .brand__mark svg { width: 16px; height: 16px; stroke-width: 2; }
@@ -177,14 +177,14 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
   gap: 8px;
   height: 44px;
   border-radius: var(--radius-md);
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   color: var(--accent-contrast);
   font-weight: 600;
   box-shadow: var(--shadow-sm);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
 }
 
-.compose-btn:hover { background: var(--accent-strong); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.compose-btn:hover { filter: brightness(1.08); box-shadow: var(--shadow-md); transform: translateY(-1px); }
 .compose-btn:active { transform: translateY(0) scale(0.98); }
 
 .nav__list { display: flex; flex-direction: column; gap: 2px; }
@@ -206,10 +206,11 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
 /* Solid fill on select, not a soft tint — this is how macOS actually
    renders a selected Finder/Mail sidebar row. */
 .nav__item--active {
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   color: #fff;
+  box-shadow: var(--shadow-sm);
 }
-.nav__item--active:hover { background: var(--accent); color: #fff; }
+.nav__item--active:hover { filter: brightness(1.05); color: #fff; }
 
 .nav__count {
   margin-left: auto;
@@ -327,17 +328,21 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
 
 .email-row {
   display: grid;
-  grid-template-columns: 20px 180px 1fr auto;
+  grid-template-columns: 16px 36px 172px 1fr auto;
   align-items: center;
   gap: 14px;
   height: var(--row-height);
   padding: 0 24px;
   border-bottom: 1px solid var(--border);
+  border-left: 3px solid transparent; /* reveals on hover, no layout shift */
   cursor: pointer;
-  transition: background var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast);
 }
 
-.email-row:hover { background: var(--bg-elevated); }
+.email-row:hover {
+  background: var(--bg-elevated);
+  border-left-color: var(--accent);
+}
 
 .email-row__indicator {
   width: 8px;
@@ -348,6 +353,33 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
   justify-self: center;
 }
 .email-row--unread .email-row__indicator { visibility: visible; }
+
+/* Sender avatars — a deterministic color per sender (in Phase 2, data.js
+   hashes the sender name to one of these 8) reads as far more alive than
+   a flat list of gray text ever does. Gradients, not flat fills, for a
+   touch of depth without tipping into gaudy. */
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  flex-shrink: 0;
+}
+
+.avatar--1 { background: linear-gradient(135deg, #818cf8, #4f46e5); }
+.avatar--2 { background: linear-gradient(135deg, #2dd4bf, #0d9488); }
+.avatar--3 { background: linear-gradient(135deg, #fb7185, #e11d48); }
+.avatar--4 { background: linear-gradient(135deg, #fbbf24, #d97706); }
+.avatar--5 { background: linear-gradient(135deg, #c084fc, #7c3aed); }
+.avatar--6 { background: linear-gradient(135deg, #4ade80, #059669); }
+.avatar--7 { background: linear-gradient(135deg, #38bdf8, #0284c7); }
+.avatar--8 { background: linear-gradient(135deg, #f472b6, #c026d3); }
 
 .email-row__sender {
   overflow: hidden;
@@ -404,6 +436,7 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
   .compose-btn { width: 44px; padding: 0; border-radius: var(--radius-full); }
   .nav__item { justify-content: center; padding: 0; }
 
-  .email-row { grid-template-columns: 16px 120px 1fr auto; padding: 0 16px; gap: 10px; }
+  .email-row { grid-template-columns: 12px 28px 100px 1fr auto; padding: 0 16px; gap: 10px; }
   .email-row__snippet { display: none; }
+  .avatar { width: 28px; height: 28px; font-size: 11px; }
 }
