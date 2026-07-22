@@ -2,8 +2,13 @@
 
 Static frontend only. No backend, no framework. Vanilla HTML/CSS/JS, on purpose —
 frameworks like React hide the exact mechanics you're trying to learn (DOM
-rendering, virtualization, event handling). Build it by hand once, and every
-framework you touch later will make more sense.
+rendering, virtualization, event handling).
+
+**Who writes the code:** I do, every line. You're new to coding and learning
+this by understanding *how it's built and why*, not by typing it yourself.
+Each phase, I write the code, then walk you through the architecture and
+concepts behind it — the same way a senior engineer would explain a design
+to a new teammate, not a coding tutorial.
 
 ---
 
