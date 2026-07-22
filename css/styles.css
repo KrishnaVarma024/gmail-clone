@@ -8,59 +8,21 @@
    ========================================================================= */
 
 :root {
-  /* ---- light theme (default) — Apple/macOS-native palette ---- */
-  --bg: #ffffff;
-  --bg-elevated: #f5f5f7;
-  --bg-hover: #ebebed;
-  --sidebar-bg: rgba(246, 246, 248, 0.72);   /* translucent — vibrancy */
-  --topbar-bg: rgba(255, 255, 255, 0.72);
-  --border: rgba(0, 0, 0, 0.08);
-  --border-strong: rgba(0, 0, 0, 0.14);
-
-  --text-primary: #1d1d1f;
-  --text-secondary: #6e6e73;
-  --text-tertiary: #a1a1a6;
-
-  --accent: #007aff;        /* Apple systemBlue, light */
-  --accent-strong: #0062cc;
-  --accent-soft: rgba(0, 122, 255, 0.12);
-  --accent-contrast: #ffffff;
-
-  --danger: #ff3b30;        /* Apple systemRed */
-
-  --row-height: 56px;      /* fixed row height — Phase 3's virtualization
-                               math is built directly on this number */
-  --sidebar-width: 248px;
-  --topbar-height: 64px;
-  --blur: 20px;
-
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
-  --radius-full: 999px;
-
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.12);
-
-  --ease: cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-fast: 120ms var(--ease);
-  --transition: 180ms var(--ease);
-}
-
-[data-theme="dark"] {
-  /* ---- dark theme — matched to macOS's actual dark-mode grays,
-     not pure black ---- */
-  --bg: #1e1e1e;
-  --bg-elevated: #2c2c2e;
-  --bg-hover: #3a3a3c;
-  --sidebar-bg: rgba(28, 28, 30, 0.72);
-  --topbar-bg: rgba(30, 30, 30, 0.72);
+  /* ---- dark theme (default) — warm "cement" gray, not blue-black.
+     Same family Tailwind calls "stone": neutral gray with a warm,
+     concrete undertone instead of the cooler slate/zinc most dark
+     UIs reach for by default. ---- */
+  --bg: #1c1a18;
+  --bg-elevated: #262320;
+  --bg-hover: #322e2a;
+  --sidebar-bg: rgba(28, 26, 24, 0.86);   /* translucent — vibrancy */
+  --topbar-bg: rgba(28, 26, 24, 0.86);
   --border: rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.14);
 
-  --text-primary: #f5f5f7;
-  --text-secondary: #98989d;
-  --text-tertiary: #6e6e73;
+  --text-primary: #f2f0ee;
+  --text-secondary: #a8a29c;
+  --text-tertiary: #78716c;
 
   --accent: #0a84ff;        /* Apple systemBlue, dark */
   --accent-strong: #409cff;
@@ -69,8 +31,49 @@
 
   --danger: #ff453a;
 
+  --row-height: 56px;      /* fixed row height — Phase 3's virtualization
+                               math is built directly on this number */
+  --sidebar-width: 248px;
+  --topbar-height: 64px;
+  --blur: 24px;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-full: 999px;
+
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.45);
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 120ms var(--ease);
+  --transition: 180ms var(--ease);
+}
+
+[data-theme="light"] {
+  /* ---- light theme — clean, crisp white, Apple's actual light-mode
+     tokens. This is the "then I can change into white and clean" state. ---- */
+  --bg: #ffffff;
+  --bg-elevated: #f5f5f5;
+  --bg-hover: #ececec;
+  --sidebar-bg: rgba(249, 249, 249, 0.86);
+  --topbar-bg: rgba(255, 255, 255, 0.86);
+  --border: rgba(0, 0, 0, 0.07);
+  --border-strong: rgba(0, 0, 0, 0.13);
+
+  --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-tertiary: #a1a1a6;
+
+  --accent: #007aff;        /* Apple systemBlue, light */
+  --accent-strong: #0062cc;
+  --accent-soft: rgba(0, 122, 255, 0.10);
+  --accent-contrast: #ffffff;
+
+  --danger: #ff3b30;        /* Apple systemRed */
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.10);
 }
 
 /* =========================================================================
@@ -94,26 +97,11 @@ body {
   overflow: hidden;
 }
 
-/* Soft color wash behind the translucent panels — without this, blurring
-   a flat background produces the same flat color and vibrancy is
-   invisible. This is what the sidebar/topbar blur actually pick up,
-   the same way macOS vibrancy picks up your desktop wallpaper. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(600px circle at 12% -8%, var(--accent-soft), transparent 60%),
-    radial-gradient(520px circle at 92% 108%, var(--accent-soft), transparent 60%);
-}
-
 ul { list-style: none; margin: 0; padding: 0; }
 button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
 input { font: inherit; color: inherit; }
 a { color: inherit; text-decoration: none; }
-svg { width: 18px; height: 18px; flex-shrink: 0; }
+svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -173,9 +161,8 @@ svg { width: 18px; height: 18px; flex-shrink: 0; }
   border-radius: var(--radius-md);
   background: var(--accent);
   color: var(--accent-contrast);
-  font-weight: 700;
-  font-size: 14px;
 }
+.brand__mark svg { width: 16px; height: 16px; stroke-width: 2; }
 
 .brand__name {
   font-weight: 600;
