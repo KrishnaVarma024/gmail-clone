@@ -26,7 +26,7 @@ full architecture and phase-by-phase build log live in
 - [x] Phase 1 — Static shell & design system (dark/light)
 - [x] Phase 2 — Mock data + naive render
 - [x] Phase 3 — List virtualization
-- [ ] Phase 4 — Compose modal
+- [x] Phase 4 — Compose modal
 - [ ] Phase 5 — Keyboard navigation (j/k)
 - [ ] Phase 6 — Skeleton loading states
 - [ ] Phase 7 — Polish & accessibility

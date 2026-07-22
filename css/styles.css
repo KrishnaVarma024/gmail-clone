@@ -455,6 +455,180 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
 }
 
 /* =========================================================================
+   COMPOSE MODAL — Phase 4
+   Lives outside .app (see the HTML comment). The overlay covers the
+   full viewport and sits above everything at z-index: 1000 — well past
+   .app's z-index: 1 and the topbar's z-index: 10, so there's no
+   possibility of the floating topbar bleeding through it.
+   ========================================================================= */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition), visibility var(--transition);
+}
+
+.modal-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.compose-modal {
+  width: min(560px, calc(100vw - 48px));
+  max-height: min(560px, calc(100vh - 96px));
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-lg);
+  background: var(--sidebar-bg);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  transform: translateY(16px) scale(0.97);
+  transition: transform var(--transition);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .compose-modal { background: var(--bg-elevated); }
+}
+
+.modal-overlay.is-open .compose-modal {
+  transform: translateY(0) scale(1);
+}
+
+.compose-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.compose-modal__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.compose-modal__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.compose-modal__close:hover { background: var(--bg-hover); color: var(--text-primary); }
+.compose-modal__close svg { width: 14px; height: 14px; }
+
+.compose-modal__body {
+  display: flex;
+  flex-direction: column;
+  padding: 0 18px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.compose-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.compose-field__label {
+  width: 56px;
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.compose-field__input {
+  flex: 1;
+  border: none;
+  background: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+.compose-field__input::placeholder { color: var(--text-tertiary); }
+
+.compose-modal__textarea {
+  flex: 1;
+  min-height: 160px;
+  margin: 14px 0;
+  border: none;
+  background: none;
+  outline: none;
+  resize: none;
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.5;
+  font-family: inherit;
+}
+.compose-modal__textarea::placeholder { color: var(--text-tertiary); }
+
+.compose-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.compose-modal__send {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 18px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), filter var(--transition-fast);
+}
+.compose-modal__send:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.compose-modal__send:active { transform: translateY(0) scale(0.98); }
+.compose-modal__send svg { width: 15px; height: 15px; }
+
+.compose-modal__discard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  color: var(--text-tertiary);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.compose-modal__discard:hover { background: var(--bg-hover); color: var(--danger); }
+
+.compose-modal__close:focus-visible,
+.compose-modal__send:focus-visible,
+.compose-modal__discard:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* =========================================================================
    RESPONSIVE
    ========================================================================= */
 
@@ -474,4 +648,6 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
   .email-row { grid-template-columns: 12px 28px 100px 1fr auto; padding: 0 16px; gap: 10px; }
   .email-row__snippet { display: none; }
   .avatar { width: 28px; height: 28px; font-size: 11px; }
+
+  .compose-modal { width: 100vw; max-height: 100vh; height: 100vh; border-radius: 0; }
 }
