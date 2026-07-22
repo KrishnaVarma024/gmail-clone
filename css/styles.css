@@ -445,13 +445,31 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
   white-space: nowrap;
 }
 
-/* keyboard focus ring — built now, wired up with real logic in Phase 5 */
+/* keyboard focus ring, for actual browser :focus (Tab-navigating buttons/
+   links) — separate from .email-row--focused below, which is OUR OWN
+   concept of "keyboard cursor position" driven by j/k, not the browser's */
 .email-row:focus-visible,
 .nav__item:focus-visible,
 .compose-btn:focus-visible,
 .theme-toggle:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: -2px;
+}
+
+/* Phase 5 — j/k moves this. It's a persistent version of the hover
+   accent bar, so the keyboard cursor reads as "the same kind of
+   highlight," just sticky instead of momentary. */
+.email-row--focused {
+  border-left-color: var(--accent);
+  background: var(--bg-elevated);
+}
+
+/* The row Enter (or a click) most recently opened — visually distinct
+   from mere focus. Declared after --focused on purpose: if a row is
+   both focused and selected (the common case right after pressing
+   Enter), this tint wins the cascade. */
+.email-row--selected {
+  background: var(--accent-soft);
 }
 
 /* =========================================================================

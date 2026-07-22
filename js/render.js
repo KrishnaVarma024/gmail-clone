@@ -47,11 +47,22 @@
     list.innerHTML = emails.map(emailRowHTML).join('');
   }
 
-  // PHASE 3 approach — `li` is one of ~20-30 pooled, reused elements.
+  // PHASE 3/5 approach — `li` is one of ~20-30 pooled, reused elements.
   // Repaint its content and reposition it for whatever data index
   // virtualList.js has decided it should represent right now.
-  function updateRow(li, email, index, rowHeight) {
-    li.className = 'email-row' + (email.unread ? ' email-row--unread' : '');
+  //
+  // focusedIndex/selectedEmailId are passed in explicitly rather than
+  // read from MailState in here — that's deliberate: it keeps this
+  // function a pure mapping from (data + inputs) -> DOM, so it can be
+  // unit-tested without a fake global store. virtualList.js reads state
+  // once per repaint and hands the two values down.
+  function updateRow(li, email, index, rowHeight, focusedIndex, selectedEmailId) {
+    var classes = 'email-row';
+    if (email.unread) classes += ' email-row--unread';
+    if (index === focusedIndex) classes += ' email-row--focused';
+    if (email.id === selectedEmailId) classes += ' email-row--selected';
+
+    li.className = classes;
     li.dataset.index = String(index);
     li.dataset.id = email.id;
     li.style.transform = 'translateY(' + (index * rowHeight) + 'px)';
