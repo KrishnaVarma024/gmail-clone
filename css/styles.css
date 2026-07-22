@@ -1,0 +1,363 @@
+/* =========================================================================
+   DESIGN TOKENS
+   Every color, spacing value, radius, and transition the whole app uses
+   is defined ONCE here as a CSS custom property. Nothing below this block
+   ever hardcodes a color. That's what makes the theme toggle a 2-line
+   JS feature instead of a rewrite: flip data-theme, every token updates,
+   every component that reads the token updates with it.
+   ========================================================================= */
+
+:root {
+  /* ---- dark theme (default) ---- */
+  --bg: #0b0b0d;
+  --bg-elevated: #131316;
+  --bg-hover: #1b1b1f;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #6b6b72;
+
+  --accent: #7c7bff;
+  --accent-strong: #6a68f0;
+  --accent-soft: rgba(124, 123, 255, 0.14);
+  --accent-contrast: #ffffff;
+
+  --danger: #f87171;
+
+  --row-height: 56px;      /* fixed row height — Phase 3's virtualization
+                               math is built directly on this number */
+  --sidebar-width: 248px;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.28);
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 120ms var(--ease);
+  --transition: 180ms var(--ease);
+}
+
+[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-elevated: #f6f6f8;
+  --bg-hover: #eeeef1;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.14);
+
+  --text-primary: #18181b;
+  --text-secondary: #52525b;
+  --text-tertiary: #8b8b93;
+
+  --accent: #635bff;
+  --accent-strong: #524ce0;
+  --accent-soft: rgba(99, 91, 255, 0.10);
+  --accent-contrast: #ffffff;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.10);
+}
+
+/* =========================================================================
+   RESET
+   ========================================================================= */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter",
+    Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  transition: background var(--transition), color var(--transition);
+}
+
+ul { list-style: none; margin: 0; padding: 0; }
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+input { font: inherit; color: inherit; }
+a { color: inherit; text-decoration: none; }
+svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* thin, subtle scrollbars — small detail, disproportionate payoff */
+* { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: var(--radius-full); }
+*::-webkit-scrollbar-track { background: transparent; }
+
+/* =========================================================================
+   APP SHELL
+   ========================================================================= */
+
+.app {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  height: 100vh;
+}
+
+/* ---- sidebar ---- */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 16px;
+  border-right: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px;
+}
+
+.brand__mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.brand__name {
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+
+.compose-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+}
+
+.compose-btn:hover { background: var(--accent-strong); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.compose-btn:active { transform: translateY(0) scale(0.98); }
+
+.nav__list { display: flex; flex-direction: column; gap: 2px; }
+
+.nav__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.nav__item:hover { background: var(--bg-elevated); color: var(--text-primary); }
+
+.nav__item--active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.nav__item--active:hover { background: var(--accent-soft); color: var(--accent); }
+
+.nav__count {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+.nav__item--active .nav__count { color: var(--accent); }
+
+.sidebar__footer { margin-top: auto; display: flex; }
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.theme-toggle:hover { background: var(--bg-elevated); color: var(--text-primary); }
+
+.icon-sun, .icon-moon { display: none; }
+[data-theme="dark"] .icon-sun { display: block; }
+[data-theme="light"] .icon-moon { display: block; }
+
+/* ---- main / topbar ---- */
+
+.main { display: flex; flex-direction: column; min-width: 0; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 64px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 420px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: var(--radius-full);
+  background: var(--bg-elevated);
+  border: 1px solid transparent;
+  color: var(--text-tertiary);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.search:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  color: var(--text-secondary);
+}
+
+.search input {
+  flex: 1;
+  border: none;
+  background: none;
+  outline: none;
+  color: var(--text-primary);
+}
+.search input::placeholder { color: var(--text-tertiary); }
+
+.account__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ---- email list ---- */
+
+.list-viewport {
+  flex: 1;
+  overflow-y: auto;
+  position: relative; /* Phase 3 positions rows absolutely within this */
+}
+
+.email-row {
+  display: grid;
+  grid-template-columns: 20px 180px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  height: var(--row-height);
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.email-row:hover { background: var(--bg-elevated); }
+
+.email-row__indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  visibility: hidden;
+  justify-self: center;
+}
+.email-row--unread .email-row__indicator { visibility: visible; }
+
+.email-row__sender {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-secondary);
+}
+.email-row--unread .email-row__sender { color: var(--text-primary); font-weight: 600; }
+
+.email-row__subject {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  min-width: 0;
+}
+.email-row--unread .email-row__subject { color: var(--text-primary); font-weight: 600; }
+
+.email-row__snippet {
+  font-weight: 400;
+  color: var(--text-tertiary);
+}
+.email-row--unread .email-row__snippet { font-weight: 400; color: var(--text-tertiary); }
+
+.email-row__time {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+/* keyboard focus ring — built now, wired up with real logic in Phase 5 */
+.email-row:focus-visible,
+.nav__item:focus-visible,
+.compose-btn:focus-visible,
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* =========================================================================
+   RESPONSIVE
+   ========================================================================= */
+
+@media (max-width: 720px) {
+  :root { --sidebar-width: 72px; }
+
+  .brand__name,
+  .compose-btn span,
+  .nav__item span:not(.nav__count),
+  .nav__count {
+    display: none;
+  }
+
+  .compose-btn { width: 44px; padding: 0; }
+  .nav__item { justify-content: center; padding: 0; }
+
+  .email-row { grid-template-columns: 16px 120px 1fr auto; padding: 0 16px; gap: 10px; }
+  .email-row__snippet { display: none; }
+}
