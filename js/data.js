@@ -112,5 +112,22 @@
     return emails;
   }
 
-  window.MailData = { generateEmails: generateEmails };
+  // Phase 6: real apps don't have their inbox sitting in memory — they
+  // fetch it, which takes time. generateEmails() stays synchronous and
+  // pure (easy to unit-test, which is exactly how it got verified back
+  // in Phase 2); this wraps it in a Promise + setTimeout to *simulate*
+  // that network latency, so app.js has something real to show a
+  // skeleton state during. Swap this for an actual fetch() later and
+  // nothing else in the app has to change — it already only knows how
+  // to consume a Promise.
+  function fetchEmails(count) {
+    return new Promise(function (resolve) {
+      var simulatedLatencyMs = 600 + Math.floor(Math.random() * 400); // 600-1000ms
+      setTimeout(function () {
+        resolve(generateEmails(count));
+      }, simulatedLatencyMs);
+    });
+  }
+
+  window.MailData = { generateEmails: generateEmails, fetchEmails: fetchEmails };
 })();

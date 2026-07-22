@@ -69,11 +69,50 @@
     li.innerHTML = rowInnerHTML(email);
   }
 
+  // PHASE 6 — skeleton placeholder rows, shown while fetchEmails() is
+  // still pending. Deliberately reuses the exact ".email-row" class —
+  // same height, same grid-template-columns as a real row — so when the
+  // real content swaps in there is nothing to reflow. A skeleton row and
+  // a real row occupy pixel-identical space; only what's drawn inside
+  // that space changes. That's what "no layout shift" actually means in
+  // practice, not just a phrase in the roadmap.
+  //
+  // Widths vary slightly by position (nth-child in CSS) purely for
+  // realism — a wall of identical gray bars reads as more obviously fake
+  // than gently uneven ones.
+  function skeletonRowHTML(index, rowHeight) {
+    return (
+      '<li class="email-row email-row--skeleton" style="transform: translateY(' + (index * rowHeight) + 'px)" aria-hidden="true">' +
+        '<span class="email-row__indicator"></span>' +
+        '<span class="skeleton skeleton--avatar"></span>' +
+        '<span class="skeleton skeleton--sender"></span>' +
+        '<span class="skeleton skeleton--subject"></span>' +
+        '<span class="skeleton skeleton--time"></span>' +
+      '</li>'
+    );
+  }
+
+  function renderSkeleton(count, rowHeight) {
+    var list = document.getElementById('emailList');
+    if (!list) return;
+
+    var html = '';
+    for (var i = 0; i < count; i++) {
+      html += skeletonRowHTML(i, rowHeight);
+    }
+
+    list.style.position = 'relative';
+    list.style.height = (count * rowHeight) + 'px';
+    list.innerHTML = html;
+  }
+
   window.MailRender = {
     escapeHTML: escapeHTML,
     rowInnerHTML: rowInnerHTML,
     emailRowHTML: emailRowHTML,
     renderAllRows: renderAllRows,
-    updateRow: updateRow
+    updateRow: updateRow,
+    skeletonRowHTML: skeletonRowHTML,
+    renderSkeleton: renderSkeleton
   };
 })();

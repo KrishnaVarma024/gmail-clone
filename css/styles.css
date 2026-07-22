@@ -473,6 +473,54 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
 }
 
 /* =========================================================================
+   SKELETON LOADING — Phase 6
+   Placeholder rows shown while fetchEmails() is pending. They reuse
+   .email-row's exact height and grid, which is the whole trick: a
+   skeleton row and a real row take up pixel-identical space, so nothing
+   reflows when one replaces the other.
+   ========================================================================= */
+
+.email-row--skeleton {
+  pointer-events: none;
+  cursor: default;
+}
+.email-row--skeleton:hover {
+  background: none;
+  border-left-color: transparent;
+}
+
+.skeleton {
+  display: block;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--bg-elevated) 25%,
+    var(--bg-hover) 50%,
+    var(--bg-elevated) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+  /* prefers-reduced-motion already neutralizes all animation-duration
+     globally (see the RESET section) — no separate override needed here */
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton--avatar { width: 32px; height: 32px; border-radius: 50%; }
+.skeleton--sender { width: 100px; height: 12px; }
+.skeleton--subject { width: 58%; height: 12px; }
+.skeleton--time { width: 40px; height: 10px; justify-self: end; }
+
+/* gentle width variation so skeleton rows don't read as a suspiciously
+   perfect wall of identical bars */
+.email-row--skeleton:nth-child(3n) .skeleton--subject { width: 40%; }
+.email-row--skeleton:nth-child(5n) .skeleton--subject { width: 75%; }
+.email-row--skeleton:nth-child(4n) .skeleton--sender { width: 72px; }
+
+/* =========================================================================
    COMPOSE MODAL — Phase 4
    Lives outside .app (see the HTML comment). The overlay covers the
    full viewport and sits above everything at z-index: 1000 — well past
