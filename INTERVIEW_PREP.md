@@ -1,4 +1,4 @@
-# Interview Q&A — Phases 0 through 5
+# Interview Q&A — Phases 0 through 6
 
 Real answers to every interview question listed in ROADMAP.md so far,
 grounded in what's actually in this codebase — not generic textbook
@@ -211,3 +211,37 @@ wired up yet), and there's no live region announcing "email opened" or
 unread-count changes. That's real, scoped work sitting in Phase 7
 (polish/accessibility) — a correct interview answer names the gap
 instead of glossing over it.
+
+---
+
+## Phase 6 — Skeleton Loading States
+
+**Q: Is your loading state simulated with `setTimeout`, or does it mirror a real async fetch pattern?**
+Both, deliberately layered: `generateEmails()` stays a synchronous, pure
+function (so it's easy to unit-test in isolation — which is exactly how
+it got verified back in Phase 2). `fetchEmails()` wraps it in a real
+`Promise` and resolves it after a randomized 600-1000ms `setTimeout`,
+simulating network latency. `app.js` only ever calls `.then()` on it —
+it has no idea whether the data came from a fake timer or a real
+`fetch()` call. Swap the inside of `fetchEmails()` for an actual network
+request later and nothing downstream changes.
+
+**Q: How do you avoid layout shift when skeletons are replaced by real rows?**
+Skeleton rows use the exact same `.email-row` class as real rows — same
+`height: var(--row-height)`, same `grid-template-columns`, positioned
+with the same `translateY()` math. A skeleton row and a real row occupy
+pixel-identical space; swapping one for the other only changes what's
+drawn inside that space, never its size or position. Verified this in
+Node: rendered 14 skeleton rows, confirmed the container height was
+exactly `14 × 56px`, then let the real fetch resolve and confirmed the
+pool took over with zero leftover skeleton markup.
+
+**Q: Why skeleton screens over a spinner?**
+A spinner tells you "something is happening" with no information about
+*what's coming*. A skeleton that matches the final layout lets your
+brain start parsing the page structure before the content exists — by
+the time real text pops in, you already know where everything goes, so
+it reads as an update rather than a page appearing from scratch. It's
+also honest about layout: a spinner gives zero indication of how many
+rows or how tall the content will be, so real content arriving can
+still cause a jump. A shaped skeleton can't lie about that.
