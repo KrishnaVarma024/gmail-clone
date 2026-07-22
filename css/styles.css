@@ -139,6 +139,7 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
   background: var(--sidebar-bg);
   backdrop-filter: blur(var(--blur)) saturate(180%);
   -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  transition: background var(--transition), border-color var(--transition);
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -222,6 +223,7 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
 .sidebar__footer { margin-top: auto; display: flex; }
 
 .theme-toggle {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -233,9 +235,25 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
 }
 .theme-toggle:hover { background: var(--bg-elevated); color: var(--text-primary); }
 
-.icon-sun, .icon-moon { display: none; }
-[data-theme="dark"] .icon-sun { display: block; }
-[data-theme="light"] .icon-moon { display: block; }
+/* Sun and moon sit stacked on top of each other and cross-fade + rotate
+   in, rather than one snapping to display:none — the one deliberately
+   playful animation in an otherwise restrained UI. */
+.icon-sun, .icon-moon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(-90deg) scale(0.4);
+  transition: transform 320ms var(--ease), opacity 320ms var(--ease);
+}
+[data-theme="dark"] .icon-sun {
+  opacity: 1;
+  transform: translate(-50%, -50%) rotate(0deg) scale(1);
+}
+[data-theme="light"] .icon-moon {
+  opacity: 1;
+  transform: translate(-50%, -50%) rotate(0deg) scale(1);
+}
 
 /* ---- main / topbar ---- */
 
@@ -265,6 +283,7 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
   backdrop-filter: blur(var(--blur)) saturate(180%);
   -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
   border-bottom: 1px solid var(--border);
+  transition: background var(--transition), border-color var(--transition);
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -283,7 +302,8 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
   background: var(--bg-elevated);
   border: 1px solid transparent;
   color: var(--text-tertiary);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition: background var(--transition), border-color var(--transition-fast),
+    box-shadow var(--transition-fast), color var(--transition);
 }
 
 .search:focus-within {
