@@ -21,6 +21,16 @@ document.addEventListener('DOMContentLoaded', function () {
   window.MailData.fetchEmails(5000).then(function (emails) {
     window.MailState.setState({ emails: emails, isLoading: false });
 
+    // That "128" next to Inbox in the sidebar was hand-typed placeholder
+    // markup from Phase 1 and never got wired to real data — caught it
+    // reviewing an actual screenshot. Real unread count is ~1,667 (1 in
+    // 3 emails, per data.js), not 128.
+    var inboxCount = document.getElementById('inboxCount');
+    if (inboxCount) {
+      var unreadCount = emails.filter(function (e) { return e.unread; }).length;
+      inboxCount.textContent = String(unreadCount);
+    }
+
     // Phase 3: virtualized render. init() clears the skeleton rows and
     // rebuilds the real pool — the DOM now holds a couple dozen row
     // elements, not 5,000. Open DevTools > Elements and count them.
