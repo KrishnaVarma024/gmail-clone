@@ -12,22 +12,28 @@ to a new teammate, not a coding tutorial.
 
 ### Design direction
 
-This is not a pixel-for-pixel Gmail clone. We borrow Gmail's *information
-architecture* (sidebar, list, compose) but the visual language is
-**Superhuman-inspired**: dark-by-default, minimal chrome, one accent color,
-buttery 150-250ms transitions, keyboard-first affordances (shortcut hints
-on hover) — with a full light mode available via a toggle. Superhuman is
-the right reference, not an arbitrary one: it's an email client that solved
-the *exact* problems this project solves — speed at scale, keyboard
-navigation — and made them feel premium instead of utilitarian. That's the
-bar: something a dev looks at and asks "wait, how did you build that."
+This is not a pixel-for-pixel Gmail clone, and not Apple Mail either. We
+borrow Gmail's *information architecture* (sidebar, list, compose) but the
+visual language is our own.
 
-The real lesson here: **visual design and system architecture are separate
-concerns.** The virtualization engine doesn't know or care whether a row is
-navy-on-dark or white-on-light — it only cares about scrollTop and row
-height. We can swap the entire visual language without touching the data,
-state, virtualization, or event layers at all. That separation is what
-makes a theme toggle a small feature instead of a rewrite.
+**Revision history, kept here on purpose — it's a legitimate part of the
+build log:** Phase 1 first shipped Superhuman-inspired (dark-by-default,
+flat, one accent color). After seeing it, we pivoted to **Apple/macOS-native**:
+light-by-default, translucent "vibrancy" panels (real `backdrop-filter`
+blur, not a fake), Apple's actual HIG color tokens (systemBlue `#007AFF`
+light / `#0A84FF` dark, label-gray text scale), softer rounded corners, and
+a floating topbar that content genuinely scrolls underneath — the same
+frosted-glass trick macOS uses in Mail, Finder, and Notes. Full dark mode
+still exists via the toggle, matched to macOS's real dark-mode grays
+(`#1e1e1e` family, not pure black) rather than an arbitrary palette.
+
+The real lesson here, true under *either* direction: **visual design and
+system architecture are separate concerns.** The virtualization engine
+doesn't know or care what color a row is — it only cares about scrollTop
+and row height. We swapped the entire visual language, mid-project, without
+touching the data, state, virtualization, or event layers at all. That
+separation is what makes a full redesign a CSS-only change instead of a
+rewrite — and it's exactly what let us change our minds here without cost.
 
 ---
 
@@ -152,6 +158,12 @@ like this?" by looking at state, instead of hunting through event handlers.
     `data-theme` attribute to swap the entire palette instantly. This is
     how real design systems (and dark-mode toggles everywhere) work under
     the hood, no framework required.
+13. **`backdrop-filter` / material vibrancy** — how macOS's "frosted glass"
+    panels actually work: blur + saturate whatever is rendered behind an
+    element, with a `@supports` fallback for browsers that don't support
+    it. The trick only reads as intentional if something with color is
+    actually behind the glass — which is why there's a soft gradient wash
+    sitting behind the whole app.
 
 ---
 
@@ -176,25 +188,32 @@ history starting point.
 - "Walk me through your commit history — what does it tell me about how you
   built this?"
 
-### Phase 1 — Static Shell & Design System (Superhuman-Inspired, Light/Dark)
+### Phase 1 — Static Shell & Design System (Apple/macOS-Native, Light/Dark)
 
 **Build:** sidebar (Compose button, folder list), top header (search,
-account), main content grid — Gmail's information architecture, Superhuman's
-visual language: dark-by-default, one accent color, generous whitespace,
-every color/spacing/radius defined once as a CSS custom property, plus a
-light-mode toggle that swaps the whole token set instantly. No data yet.
-**Accomplish after:** a static, zero-JS-data page that already looks premium
-in both themes, and a theming architecture every later phase inherits for
-free — nobody has to think about "does this new component support dark
-mode," it already does.
+account), main content grid — Gmail's information architecture, an
+Apple/macOS-native visual language: light-by-default, real `backdrop-filter`
+vibrancy on the sidebar and a floating topbar (content genuinely scrolls
+underneath it, frosted-glass style), Apple's actual systemBlue/label-gray
+tokens, softer rounded corners — every color/spacing/radius defined once as
+a CSS custom property, with a full dark-mode toggle (matched to macOS's real
+dark-mode grays) that swaps the whole token set instantly. No data yet.
+**Accomplish after:** a static, zero-JS-data page that already looks
+native to a Mac in both themes, and a theming architecture every later
+phase inherits for free — nobody has to think about "does this new
+component support dark mode," it already does.
 **Concepts used:** box model, Flexbox/Grid, responsive layout, CSS custom
-properties & design tokens, theme toggling without a framework.
+properties & design tokens, `backdrop-filter` vibrancy, theme toggling
+without a framework.
 **Interview questions:**
 - "Why Flexbox/Grid here instead of floats or absolute positioning?"
 - "How does this layout behave at 320px wide, and how did you handle it?"
 - "Walk me through your theming system — why CSS variables over two
   stylesheets or a CSS-in-JS approach?"
 - "How do you avoid a flash of the wrong theme on page load?"
+- "Your topbar is `position: absolute`, not a normal flex child — why?
+  What does that buy you?"
+- "What's your fallback for browsers that don't support `backdrop-filter`?"
 - "What's the difference between reflow and repaint — does your layout
   trigger unnecessary ones?"
 

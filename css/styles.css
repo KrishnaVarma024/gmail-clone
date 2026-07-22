@@ -8,59 +8,69 @@
    ========================================================================= */
 
 :root {
-  /* ---- dark theme (default) ---- */
-  --bg: #0b0b0d;
-  --bg-elevated: #131316;
-  --bg-hover: #1b1b1f;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.14);
+  /* ---- light theme (default) — Apple/macOS-native palette ---- */
+  --bg: #ffffff;
+  --bg-elevated: #f5f5f7;
+  --bg-hover: #ebebed;
+  --sidebar-bg: rgba(246, 246, 248, 0.72);   /* translucent — vibrancy */
+  --topbar-bg: rgba(255, 255, 255, 0.72);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.14);
 
-  --text-primary: #f4f4f5;
-  --text-secondary: #a1a1aa;
-  --text-tertiary: #6b6b72;
+  --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-tertiary: #a1a1a6;
 
-  --accent: #7c7bff;
-  --accent-strong: #6a68f0;
-  --accent-soft: rgba(124, 123, 255, 0.14);
+  --accent: #007aff;        /* Apple systemBlue, light */
+  --accent-strong: #0062cc;
+  --accent-soft: rgba(0, 122, 255, 0.12);
   --accent-contrast: #ffffff;
 
-  --danger: #f87171;
+  --danger: #ff3b30;        /* Apple systemRed */
 
   --row-height: 56px;      /* fixed row height — Phase 3's virtualization
                                math is built directly on this number */
   --sidebar-width: 248px;
+  --topbar-height: 64px;
+  --blur: 20px;
 
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
   --radius-full: 999px;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.28);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.12);
 
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
   --transition-fast: 120ms var(--ease);
   --transition: 180ms var(--ease);
 }
 
-[data-theme="light"] {
-  --bg: #ffffff;
-  --bg-elevated: #f6f6f8;
-  --bg-hover: #eeeef1;
-  --border: rgba(0, 0, 0, 0.08);
-  --border-strong: rgba(0, 0, 0, 0.14);
+[data-theme="dark"] {
+  /* ---- dark theme — matched to macOS's actual dark-mode grays,
+     not pure black ---- */
+  --bg: #1e1e1e;
+  --bg-elevated: #2c2c2e;
+  --bg-hover: #3a3a3c;
+  --sidebar-bg: rgba(28, 28, 30, 0.72);
+  --topbar-bg: rgba(30, 30, 30, 0.72);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
 
-  --text-primary: #18181b;
-  --text-secondary: #52525b;
-  --text-tertiary: #8b8b93;
+  --text-primary: #f5f5f7;
+  --text-secondary: #98989d;
+  --text-tertiary: #6e6e73;
 
-  --accent: #635bff;
-  --accent-strong: #524ce0;
-  --accent-soft: rgba(99, 91, 255, 0.10);
+  --accent: #0a84ff;        /* Apple systemBlue, dark */
+  --accent-strong: #409cff;
+  --accent-soft: rgba(10, 132, 255, 0.18);
   --accent-contrast: #ffffff;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.10);
+  --danger: #ff453a;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.45);
 }
 
 /* =========================================================================
@@ -80,6 +90,23 @@ body {
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
   transition: background var(--transition), color var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Soft color wash behind the translucent panels — without this, blurring
+   a flat background produces the same flat color and vibrancy is
+   invisible. This is what the sidebar/topbar blur actually pick up,
+   the same way macOS vibrancy picks up your desktop wallpaper. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(600px circle at 12% -8%, var(--accent-soft), transparent 60%),
+    radial-gradient(520px circle at 92% 108%, var(--accent-soft), transparent 60%);
 }
 
 ul { list-style: none; margin: 0; padding: 0; }
@@ -109,6 +136,8 @@ svg { width: 18px; height: 18px; flex-shrink: 0; }
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
   height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
 /* ---- sidebar ---- */
@@ -119,7 +148,13 @@ svg { width: 18px; height: 18px; flex-shrink: 0; }
   gap: 20px;
   padding: 20px 16px;
   border-right: 1px solid var(--border);
-  background: var(--bg);
+  background: var(--sidebar-bg);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .sidebar { background: var(--bg-elevated); }
 }
 
 .brand {
@@ -154,7 +189,7 @@ svg { width: 18px; height: 18px; flex-shrink: 0; }
   justify-content: center;
   gap: 8px;
   height: 44px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   background: var(--accent);
   color: var(--accent-contrast);
   font-weight: 600;
@@ -181,18 +216,20 @@ svg { width: 18px; height: 18px; flex-shrink: 0; }
 
 .nav__item:hover { background: var(--bg-elevated); color: var(--text-primary); }
 
+/* Solid fill on select, not a soft tint — this is how macOS actually
+   renders a selected Finder/Mail sidebar row. */
 .nav__item--active {
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--accent);
+  color: #fff;
 }
-.nav__item--active:hover { background: var(--accent-soft); color: var(--accent); }
+.nav__item--active:hover { background: var(--accent); color: #fff; }
 
 .nav__count {
   margin-left: auto;
   font-size: 12px;
   color: var(--text-tertiary);
 }
-.nav__item--active .nav__count { color: var(--accent); }
+.nav__item--active .nav__count { color: rgba(255, 255, 255, 0.85); }
 
 .sidebar__footer { margin-top: auto; display: flex; }
 
@@ -214,17 +251,36 @@ svg { width: 18px; height: 18px; flex-shrink: 0; }
 
 /* ---- main / topbar ---- */
 
-.main { display: flex; flex-direction: column; min-width: 0; }
+.main { position: relative; min-width: 0; height: 100%; }
 
+/*
+  The topbar floats above the list on purpose (position: absolute, taken
+  out of normal flow) instead of sitting above it in a flex column. That's
+  what lets the email list scroll UP AND UNDERNEATH it — you'll see rows
+  pass behind a genuinely frosted-glass toolbar, the same trick macOS uses
+  in Mail/Finder/Notes. Purely visual choice: list-viewport below is still
+  the one and only scroll container the virtualization engine reads from.
+*/
 .topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  height: 64px;
+  height: var(--topbar-height);
   padding: 0 24px;
+  background: var(--topbar-bg);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
   border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .topbar { background: var(--bg); }
 }
 
 .search {
@@ -274,9 +330,12 @@ svg { width: 18px; height: 18px; flex-shrink: 0; }
 /* ---- email list ---- */
 
 .list-viewport {
-  flex: 1;
+  position: absolute; /* Phase 3 positions rows absolutely within this */
+  inset: 0;
   overflow-y: auto;
-  position: relative; /* Phase 3 positions rows absolutely within this */
+  padding-top: var(--topbar-height); /* room for the floating topbar;
+    scrolls away naturally, which is exactly what makes rows pass
+    underneath the glass */
 }
 
 .email-row {
@@ -355,7 +414,7 @@ svg { width: 18px; height: 18px; flex-shrink: 0; }
     display: none;
   }
 
-  .compose-btn { width: 44px; padding: 0; }
+  .compose-btn { width: 44px; padding: 0; border-radius: var(--radius-full); }
   .nav__item { justify-content: center; padding: 0; }
 
   .email-row { grid-template-columns: 16px 120px 1fr auto; padding: 0 16px; gap: 10px; }

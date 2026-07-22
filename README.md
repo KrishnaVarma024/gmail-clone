@@ -4,8 +4,9 @@ A static, no-framework front end exploring how real-world apps handle large
 lists efficiently: list virtualization, keyboard-driven navigation, and a
 light/dark design system — all in vanilla HTML/CSS/JS.
 
-Not trying to look like Gmail or Apple Mail — same information architecture
-(sidebar, list, compose), original visual language, Superhuman-inspired.
+Not trying to look like Gmail — same information architecture (sidebar,
+list, compose), but an Apple/macOS-native visual language: light-by-default,
+real translucent "vibrancy" panels, systemBlue accents, full dark mode.
 
 ## Run it
 
