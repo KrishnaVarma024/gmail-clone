@@ -346,7 +346,18 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
     underneath the glass */
 }
 
+/* Phase 3: rows are positioned with transform: translateY(), not normal
+   document flow — that's what lets virtualList.js recycle a small pool
+   of these and move them around instead of creating/destroying nodes.
+   #emailList (the .email-list below) is their positioning context and
+   has its height set by JS to emails.length * --row-height, so the
+   native scrollbar still reflects the true size of the whole list. */
 .email-row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  will-change: transform;
   display: grid;
   grid-template-columns: 16px 36px 172px 1fr auto;
   align-items: center;
@@ -357,6 +368,10 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
   border-left: 3px solid transparent; /* reveals on hover, no layout shift */
   cursor: pointer;
   transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.email-list {
+  position: relative; /* height set inline by virtualList.js */
 }
 
 .email-row:hover {
