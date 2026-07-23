@@ -8,6 +8,14 @@
    ========================================================================= */
 
 :root {
+  /* Phase 7 audit — tells the BROWSER's own chrome (scrollbar track/
+     thumb on Windows, form control defaults, autofill dropdown) which
+     palette to render in, so it matches our theme instead of silently
+     following the OS setting regardless of what data-theme says. Our
+     own scrollbar rule below already sets explicit colors either way,
+     but this covers everything we don't hand-style ourselves. */
+  color-scheme: dark;
+
   /* ---- dark theme (default) — warm "cement" gray, not blue-black.
      Same family Tailwind calls "stone": neutral gray with a warm,
      concrete undertone instead of the cooler slate/zinc most dark
@@ -56,6 +64,8 @@
 }
 
 [data-theme="light"] {
+  color-scheme: light;
+
   /* ---- light theme — clean, crisp white, Apple's actual light-mode
      tokens. This is the "then I can change into white and clean" state. ---- */
   --bg: #ffffff;

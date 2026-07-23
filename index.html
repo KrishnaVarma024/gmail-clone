@@ -139,7 +139,7 @@
         <input type="search" placeholder="Search mail" aria-label="Search mail">
       </div>
       <div class="account">
-        <div class="account__avatar" title="krishnavarma024@gmail.com">KV</div>
+        <div class="account__avatar" title="krishnavarma024@gmail.com" aria-label="Account: krishnavarma024@gmail.com">KV</div>
       </div>
     </header>
 
@@ -200,6 +200,7 @@
         <label class="compose-field__label" for="composeSubject">Subject</label>
         <input class="compose-field__input" id="composeSubject" type="text" placeholder="Subject" autocomplete="off">
       </div>
+      <label class="sr-only" for="composeBody">Message body</label>
       <textarea class="compose-modal__textarea" id="composeBody" placeholder="Write your message..."></textarea>
     </div>
 
