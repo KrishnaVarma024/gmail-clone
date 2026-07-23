@@ -21,11 +21,16 @@
   --border-strong: rgba(255, 255, 255, 0.14);
 
   --text-primary: #f2f0ee;
-  --text-secondary: #a8a29c;
-  --text-tertiary: #78716c;
+  --text-secondary: #c2bcb3;  /* WCAG AA fix — see Phase 7 notes below */
+  --text-tertiary: #a8a29c;
 
-  --accent: #0a84ff;        /* Apple systemBlue, dark */
-  --accent-strong: #409cff;
+  --accent: #0a84ff;         /* Apple systemBlue, dark — used for icons,
+                                 borders, rings: 3:1 (non-text) is enough */
+  --accent-strong: #0864c4;  /* WCAG AA fix — darker so white button text
+                                 clears 4.5:1; was #409cff (a LIGHTER
+                                 hover-brighten shade that made contrast
+                                 worse, not better) */
+  --accent-strong-2: #054a94;
   --accent-soft: rgba(10, 132, 255, 0.18);
   --accent-contrast: #ffffff;
 
@@ -62,11 +67,14 @@
   --border-strong: rgba(0, 0, 0, 0.13);
 
   --text-primary: #1d1d1f;
-  --text-secondary: #6e6e73;
-  --text-tertiary: #a1a1a6;
+  --text-secondary: #4b4b50;  /* WCAG AA fix — see Phase 7 notes below */
+  --text-tertiary: #6e6e73;
 
-  --accent: #007aff;        /* Apple systemBlue, light */
-  --accent-strong: #0062cc;
+  --accent: #007aff;         /* Apple systemBlue, light — icons/borders/
+                                 rings only: 3:1 (non-text) is enough */
+  --accent-strong: #0052a3;  /* WCAG AA fix — darker so white button text
+                                 clears 4.5:1; was #0062cc (only 4.02:1) */
+  --accent-strong-2: #004a94;
   --accent-soft: rgba(0, 122, 255, 0.10);
   --accent-contrast: #ffffff;
 
@@ -160,7 +168,10 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
   width: 28px;
   height: 28px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  /* WCAG fix: white text sits on this, so both gradient stops use the
+     darker --accent-strong/-2 pair instead of the lighter --accent —
+     see the contrast note where these tokens are defined. */
+  background: linear-gradient(135deg, var(--accent-strong), var(--accent-strong-2));
   color: var(--accent-contrast);
 }
 .brand__mark svg { width: 16px; height: 16px; stroke-width: 2; }
@@ -178,7 +189,10 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
   gap: 8px;
   height: 44px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  /* WCAG fix: white text sits on this, so both gradient stops use the
+     darker --accent-strong/-2 pair instead of the lighter --accent —
+     see the contrast note where these tokens are defined. */
+  background: linear-gradient(135deg, var(--accent-strong), var(--accent-strong-2));
   color: var(--accent-contrast);
   font-weight: 600;
   box-shadow: var(--shadow-sm);
@@ -207,7 +221,10 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
 /* Solid fill on select, not a soft tint — this is how macOS actually
    renders a selected Finder/Mail sidebar row. */
 .nav__item--active {
-  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  /* WCAG fix: white text sits on this, so both gradient stops use the
+     darker --accent-strong/-2 pair instead of the lighter --accent —
+     see the contrast note where these tokens are defined. */
+  background: linear-gradient(135deg, var(--accent-strong), var(--accent-strong-2));
   color: #fff;
   box-shadow: var(--shadow-sm);
 }
@@ -664,7 +681,10 @@ svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 1.5; }
   height: 36px;
   padding: 0 18px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  /* WCAG fix: white text sits on this, so both gradient stops use the
+     darker --accent-strong/-2 pair instead of the lighter --accent —
+     see the contrast note where these tokens are defined. */
+  background: linear-gradient(135deg, var(--accent-strong), var(--accent-strong-2));
   color: #fff;
   font-weight: 600;
   font-size: 13px;
