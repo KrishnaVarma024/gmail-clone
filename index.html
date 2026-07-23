@@ -24,6 +24,15 @@
 </head>
 <body>
 
+<!--
+  Phase 7: a visually-hidden live region. Screen readers announce
+  whatever text gets written in here, even though sighted users never
+  see it — this is how "email opened" gets spoken aloud without a
+  visible toast/notification cluttering the UI. keyboard.js is the only
+  file that writes to it (see announce() in keyboard.js).
+-->
+<div id="ariaLiveRegion" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
 <div class="app">
 
   <!-- ===================== SIDEBAR ===================== -->
@@ -50,7 +59,7 @@
     <nav class="nav" aria-label="Folders">
       <ul class="nav__list">
         <li>
-          <a href="#" class="nav__item nav__item--active">
+          <a href="#" class="nav__item nav__item--active" aria-current="page">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
               <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
@@ -142,7 +151,17 @@
       rows actually get created does.
     -->
     <main class="list-viewport" id="listViewport" aria-label="Email list">
-      <ul class="email-list" id="emailList">
+      <!--
+        Phase 7: role="listbox" + tabindex="0" turns this into a real
+        focusable widget so a screen reader user can Tab into it. Once
+        it has DOM focus, aria-activedescendant (kept in sync by
+        virtualList.js on every repaint) tells assistive tech which
+        row is the current keyboard cursor position — without that,
+        j/k moving state.focusedIndex around would be invisible to
+        anyone not looking at the screen. See render.js's updateRow()
+        for the per-row role="option"/aria-selected/aria-posinset.
+      -->
+      <ul class="email-list" id="emailList" role="listbox" aria-label="Inbox" tabindex="0">
         <noscript>
           <li class="email-row">
             <span class="email-row__subject">This app needs JavaScript enabled to load your inbox.</span>

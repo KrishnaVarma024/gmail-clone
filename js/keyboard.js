@@ -18,6 +18,18 @@
     return tag === 'INPUT' || tag === 'TEXTAREA' || el.isContentEditable === true;
   }
 
+  // Phase 7 — writes into the visually-hidden #ariaLiveRegion. Screen
+  // readers watch that element and speak whatever text lands in it,
+  // even though it's invisible on screen. Used for state changes that
+  // aren't already implied by aria-activedescendant moving (see
+  // virtualList.js) — "the cursor moved to a new row" is covered by
+  // activedescendant alone; "this row just got marked read and opened"
+  // is not, so openFocused() below announces it explicitly.
+  function announce(message) {
+    var region = document.getElementById('ariaLiveRegion');
+    if (region) region.textContent = message;
+  }
+
   function moveFocus(delta) {
     var state = window.MailState.getState();
     var total = state.emails.length;
@@ -29,6 +41,14 @@
 
     window.MailState.setState({ focusedIndex: next });
     window.MailVirtualList.scrollToIndex(next);
+
+    // aria-activedescendant only gets announced by assistive tech if
+    // DOM focus is actually sitting on the container that owns it —
+    // otherwise the attribute changes silently. isTypingTarget() has
+    // already ruled out the user being mid-type in a field by the time
+    // onKeydown calls this, so it's always safe to move real focus here.
+    var list = document.getElementById('emailList');
+    if (list && document.activeElement !== list) list.focus({ preventScroll: true });
   }
 
   // Opens whatever is currently focused: marks it read (like real Gmail
@@ -46,6 +66,8 @@
 
     window.MailState.setState({ selectedEmailId: email.id });
     window.MailVirtualList.scrollToIndex(index); // repaint so read + selected show immediately
+
+    announce('Opened: ' + email.subject + ', from ' + email.sender);
   }
 
   function selectByIndex(index) {
@@ -93,5 +115,11 @@
     if (list) list.addEventListener('click', onListClick);
   });
 
-  window.MailKeyboard = { moveFocus: moveFocus, openFocused: openFocused, selectByIndex: selectByIndex };
+  window.MailKeyboard = {
+    moveFocus: moveFocus,
+    openFocused: openFocused,
+    selectByIndex: selectByIndex,
+    isTypingTarget: isTypingTarget,
+    announce: announce
+  };
 })();

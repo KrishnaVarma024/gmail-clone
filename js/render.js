@@ -47,6 +47,23 @@
     list.innerHTML = emails.map(emailRowHTML).join('');
   }
 
+  // Phase 7 — the accessible name for a row. Pulled out as its own pure
+  // function (string in, string out, no DOM) for the same reason
+  // escapeHTML/rowInnerHTML are: easy to unit-test in isolation. Set as
+  // an explicit aria-label rather than relying on the browser's default
+  // "concatenate the visible text" behavior, because the thing that
+  // matters most here — unread vs. read — is conveyed visually only by
+  // font-weight, which has no text equivalent unless we say it out loud
+  // ourselves.
+  function rowAriaLabel(email) {
+    var parts = [];
+    if (email.unread) parts.push('Unread');
+    parts.push(email.sender);
+    parts.push(email.subject);
+    parts.push(email.time);
+    return parts.join(', ');
+  }
+
   // PHASE 3/5 approach — `li` is one of ~20-30 pooled, reused elements.
   // Repaint its content and reposition it for whatever data index
   // virtualList.js has decided it should represent right now.
@@ -56,7 +73,13 @@
   // function a pure mapping from (data + inputs) -> DOM, so it can be
   // unit-tested without a fake global store. virtualList.js reads state
   // once per repaint and hands the two values down.
-  function updateRow(li, email, index, rowHeight, focusedIndex, selectedEmailId) {
+  //
+  // `total` (Phase 7) is only used for aria-posinset/aria-setsize — it
+  // tells assistive tech "this is item 3,242 of 5,000" even though only
+  // ~20 siblings actually exist in the DOM at once. Without it, a
+  // screen reader has no way to know the list is longer than however
+  // many <li> elements it can currently see.
+  function updateRow(li, email, index, rowHeight, focusedIndex, selectedEmailId, total) {
     var classes = 'email-row';
     if (email.unread) classes += ' email-row--unread';
     if (index === focusedIndex) classes += ' email-row--focused';
@@ -67,6 +90,17 @@
     li.dataset.id = email.id;
     li.style.transform = 'translateY(' + (index * rowHeight) + 'px)';
     li.innerHTML = rowInnerHTML(email);
+
+    // Stable per-EMAIL id (not per-pooled-node) — this is what lets
+    // #emailList's aria-activedescendant keep pointing at the right
+    // logical row even though the physical <li> holding that id
+    // changes constantly as the pool recycles during scrolling.
+    li.id = 'email-row-' + email.id;
+    li.setAttribute('role', 'option');
+    li.setAttribute('aria-selected', email.id === selectedEmailId ? 'true' : 'false');
+    li.setAttribute('aria-posinset', String(index + 1));
+    li.setAttribute('aria-setsize', String(total));
+    li.setAttribute('aria-label', rowAriaLabel(email));
   }
 
   // PHASE 6 — skeleton placeholder rows, shown while fetchEmails() is
@@ -109,6 +143,7 @@
   window.MailRender = {
     escapeHTML: escapeHTML,
     rowInnerHTML: rowInnerHTML,
+    rowAriaLabel: rowAriaLabel,
     emailRowHTML: emailRowHTML,
     renderAllRows: renderAllRows,
     updateRow: updateRow,

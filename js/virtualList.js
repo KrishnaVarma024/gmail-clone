@@ -95,7 +95,20 @@
 
       var email = emails[dataIndex];
       li.style.display = '';
-      window.MailRender.updateRow(li, email, dataIndex, ROW_HEIGHT, appState.focusedIndex, appState.selectedEmailId);
+      window.MailRender.updateRow(li, email, dataIndex, ROW_HEIGHT, appState.focusedIndex, appState.selectedEmailId, emails.length);
+    }
+
+    // Phase 7 — keep the listbox's aria-activedescendant pointed at
+    // whichever row is the current keyboard cursor. This is safe to set
+    // unconditionally here (not just from keyboard.js) because
+    // scrollToIndex() always forces a synchronous renderVisible() call
+    // before returning — by the time this line runs, the option with
+    // that id is guaranteed to actually exist in the DOM, the same
+    // guarantee .email-row--focused already relies on.
+    if (appState.focusedIndex >= 0 && appState.focusedIndex < emails.length) {
+      container.setAttribute('aria-activedescendant', 'email-row-' + emails[appState.focusedIndex].id);
+    } else {
+      container.removeAttribute('aria-activedescendant');
     }
   }
 

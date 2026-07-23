@@ -27,6 +27,15 @@
     overlay.classList.add('is-open');
     overlay.setAttribute('aria-hidden', 'false');
 
+    // Phase 7 — the focus trap (below) already stops a KEYBOARD user
+    // from tabbing into the app behind the modal, but a screen reader's
+    // own "browse mode" navigation isn't keyboard-Tab and isn't bound by
+    // that trap. aria-hidden on the whole app removes it from the
+    // accessibility tree entirely while the modal is open, so swipe/
+    // arrow-key browsing on a screen reader can't land on it either.
+    var app = document.querySelector('.app');
+    if (app) app.setAttribute('aria-hidden', 'true');
+
     // Wait a frame so the CSS transition has a "before" state to animate
     // from, and so focus lands after the modal is actually visible.
     requestAnimationFrame(function () {
@@ -45,6 +54,9 @@
 
     overlay.classList.remove('is-open');
     overlay.setAttribute('aria-hidden', 'true');
+
+    var app = document.querySelector('.app');
+    if (app) app.removeAttribute('aria-hidden');
 
     document.removeEventListener('keydown', onKeydown, true);
 
