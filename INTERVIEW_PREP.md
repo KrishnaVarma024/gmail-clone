@@ -1,4 +1,4 @@
-# Interview Q&A — Phases 0 through 6
+# Interview Q&A — Phases 0 through 7
 
 Real answers to every interview question listed in ROADMAP.md so far,
 grounded in what's actually in this codebase — not generic textbook
@@ -245,3 +245,98 @@ it reads as an update rather than a page appearing from scratch. It's
 also honest about layout: a spinner gives zero indication of how many
 rows or how tall the content will be, so real content arriving can
 still cause a jump. A shaped skeleton can't lie about that.
+
+---
+
+## Phase 7 — Polish, Accessibility & Final Pass
+
+**Q: What's your Lighthouse performance score, and what's the remaining bottleneck?**
+Honestly — I don't have a real number, and I'd rather say that plainly
+than invent one. There's no headless browser available in the
+environment this was built in (Puppeteer's Chromium download is
+blocked by the sandbox's network allowlist, and there's no root to
+install a system browser — documented in AUDIT.md), so Lighthouse
+itself never ran. What I *can* stand behind: the specific things
+Lighthouse's performance/accessibility/best-practices audits actually
+check were verified independently — DOM node count stays ~20
+regardless of list size (that's the whole point of virtualization),
+skeleton-to-real swaps cause zero layout shift (verified in
+`tests/render.test.js` by asserting the container height is exactly
+`count × rowHeight`), and every interactive element has a real
+accessible name (verified by hand in AUDIT.md, catching two gaps a
+tool like Lighthouse would have flagged: the compose textarea's
+missing label and the account avatar's `title`-only identification).
+That's real signal, just not a single number from the actual tool.
+
+**Q: How did you verify color contrast holds up in both your light and dark themes?**
+Wrote a WCAG 2.1 relative-luminance/contrast-ratio calculator from the
+actual formula (`0.2126R + 0.7152G + 0.0722B` with sRGB linearization,
+then `(L1+0.05)/(L2+0.05)`) and ran it against the live CSS custom
+property values — not eyeballed, computed. It found two real failures
+in both themes: `--text-tertiary` (timestamps/snippets) was below
+4.5:1 against the background, and white button text on the accent
+gradient was below 4.5:1 (dark theme's `--accent-strong` had
+accidentally been defined as a *lighter* hover-brighten shade,
+`#409cff`, which made the weakest point of the gradient even less
+contrasty). Fixed by restructuring the gray scale and introducing a
+genuinely darker `--accent-strong`/`--accent-strong-2` pair for
+buttons specifically. Final numbers: dark theme's button text sits at
+5.78:1 (vs. required 4.5:1), light theme's at 7.68:1 — both with real
+margin, not just barely passing. Re-verified after every subsequent
+CSS change in this phase.
+
+**Q: If this needed a real backend tomorrow, what in your architecture changes vs. stays the same?**
+Exactly one file changes in a meaningful way: `data.js`'s
+`fetchEmails()` already returns a `Promise` that resolves to an array
+of email objects — swap its internals from `setTimeout(() =>
+resolve(generateEmails(count)))` to a real `fetch('/api/emails').then(r
+=> r.json())`, and every caller (`app.js`) is already written against
+"a Promise that resolves to emails," so nothing downstream notices the
+difference. `state.js`, `virtualList.js`, `render.js`, and
+`keyboard.js` never talk to the network at all — they only ever read
+`state.emails`, however it got populated. The one place that *would*
+need new code: `compose.js`'s `onSend()` currently just clears fields
+and logs to console — that's where a real `POST /api/emails` call
+would go, plus optimistic-UI handling for the send-in-flight state and
+error handling for a failed send, neither of which exists yet because
+there's nothing to fail against right now.
+
+**Q: How would you add automated tests to this, with no framework?**
+Already done, not hypothetical — `tests/` has 60 tests across 7 files
+using only Node's built-in `node:test` and `node:assert/strict`
+modules (`node --test`, zero installed dependencies). The one real
+obstacle was having no browser to run them in: `js/*.js` reads
+`document`/`window` directly, so `test-support/fakeDom.js` is a small
+hand-rolled fake DOM (Element/Document/Window) — not jsdom or
+Puppeteer, both of which would violate the project's zero-dependency
+rule — built for exactly the subset of the DOM API this codebase
+actually touches, then the real source files load unmodified into a
+Node `vm` context against it. That means tests exercise the actual
+shipped code, not a reimplementation of its logic. Coverage highlights:
+`computeRange()` gets an exhaustive sweep (13px steps across the full
+5,000-row range, a step size deliberately not a multiple of the 56px
+row height, to catch alignment bugs) plus a named regression test for
+the real TOP_OFFSET bug found and fixed back in Phase 5; the compose
+modal's focus trap is tested by actually building the real DOM tree
+and asserting Tab/Shift+Tab wrap correctly, not stubbed out.
+
+**Q: How did you make the virtualized list itself accessible, not just keyboard-operable?**
+This was an explicitly named gap from the Phase 5 answer above, closed
+in this phase. `#emailList` is `role="listbox"` with `tabindex="0"` —
+it needs real DOM focus for what comes next to actually get announced.
+Every pooled row gets `role="option"`, a stable id keyed to the EMAIL
+(`email-row-{id}`, not the pooled node, since nodes get recycled
+constantly), `aria-selected`, and `aria-posinset`/`aria-setsize` so a
+screen reader can announce "item 3,242 of 5,000" even though only
+~20 siblings physically exist in the DOM at once. On every repaint,
+`virtualList.js` points `#emailList`'s `aria-activedescendant` at
+whichever row is the current keyboard cursor — reusing the exact same
+guarantee `scrollToIndex()`'s forced synchronous repaint already gives
+`.email-row--focused` (the row is guaranteed to exist by the time the
+attribute is set). For state changes that activedescendant alone
+doesn't cover — "this email is now marked read and opened" — a
+visually-hidden `aria-live="polite"` region gets an explicit
+announcement. Verified all of it in Node: activedescendant tracking
+row 0 and row 4999 correctly with the referenced row confirmed
+actually rendered (not just claimed), and the exact announcement text
+after opening an email.
